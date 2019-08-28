@@ -12,28 +12,26 @@ if(is_post_request()){
     $menu_name = $_POST['menu_name'] ?? '';
     $position = $_POST['position'] ?? '';
     $visible = $_POST['visible'] ?? '' ;
-    
-    if(insert_subject($menu_name,$position,$visible)){
-        $new_id = mysqli_insert_id($db);
-        redirect_to(url_for('/staff/subjects/show.php?id=' . $new_id));       
-    }else{
-        echo "Error Creating Subject: " . mysqli_error($db);
-        db_disconnect($db);
-        exit;
-    }
-}
 
+    echo "Form Parameters <br />";
+    echo "Menu Name: " . $menu_name . "<br />";
+    echo "Position: " . $position . "<br />";
+    echo "Visible: " . $visible . "<br />";
+
+}
 ?>
 
-<?php $page_title = 'Create Subject' ?>
+
+<?php $page_title = "Create Page"; ?>
 <?php include(SHARED_PATH . '/staff_header.php'); ?>
-<div id="content">
-    <div class="back-link"><a class="action" href="<?php echo url_for('/staff/subjects/index.php');?>">&laquo; Back to list</a></div>
 
-    <div class="subject new">
-        <h1>Create Subject</h1>
+<div id ="content">
+    <div class="back-link"><a class="action" href="<?php echo url_for('/staff/pages/index.php');?>">&laquo; Back to list</a></div>
+    
+    <div class="page new">
+        <h1>Create Page</h1>
 
-        <form action="<?php echo url_for('/staff/subjects/new.php')?>" method="post">
+        <form action="<?php echo url_for('/staff/pages/new.php');?>" method="post">
             <dl>
                 <dt>Menu name</dt>
                 <dd><input type='text' name='menu_name' value="<?php 
@@ -55,7 +53,7 @@ if(is_post_request()){
                 </dd>
             </dl>
             <div id="operations">
-                <input type="submit" name="submit" value="Create Subject" />
+                <input type="submit" name="submit" value="Create Page"/>
             </div>
         </form>
     </div>
