@@ -17,9 +17,11 @@
         <table class="list">
             <tr>
                 <th>id</th>
+                <th>Subject_ID</th>
                 <th>Positon</th>
                 <th>Visible</th>
                 <th>Name</th>
+                <th>Content</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
@@ -27,12 +29,14 @@
             <?php while($page = mysqli_fetch_assoc($rs)) { ?>
                 <tr>
                     <td><?php echo h($page['id']);?></td>
+                    <td><?php echo h($page['subject_id']);?></td>
                     <td><?php echo h($page['position']);?></td>
                     <td><?php echo $page['visible'] ? 'true' : 'false'; ?></td>
                     <td><?php echo h($page['menu_name']); ?></td>
+                    <td><?php echo h($page['content']); ?></td>
                     <td><a class="action" href="<?php echo url_for('/staff/pages/show.php?id=' . h(u($page['id'])));?>">View</a></td>
                     <td><a class="action" href="<?php echo url_for('/staff/pages/edit.php?id=' . h(u($page['id'])));?>">Edit</a></td>
-                    <td><a class="action" href="">Delete</a></td>
+                    <td><a class="action" href="<?php echo url_for('/staff/pages/delete.php?id=' . h(u($page['id'])));?>">Delete</a></td>
                 </tr>
             <?php } ?>
         </table>
