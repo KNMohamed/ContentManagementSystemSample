@@ -30,17 +30,16 @@
     //   has_legnth('abcd',[ 'min' => 3, 'max' => 5])
     // * spaces count towards length
     // * use trim() if spaces should not count
-    function has_length($value, $option) {
-        if(isset($options['min']) && !has_length_greater_than($value,$option['min'] - 1)){
-            return false;
-        }
-        elseif(isset($options['max']) && !has_length_less_than($value,$option['max'] + 1)){
-            return false;
-        }elseif(isset($options['exact']) && !has_length_exactly($value,$options['exact'])){
-            return false;
-        }else{
-            return true;
-        }       
+    function has_length($value, $options) {
+    if(isset($options['min']) && !has_length_greater_than($value, $options['min'])) {
+      return false;
+    } elseif(isset($options['max']) && !has_length_less_than($value, $options['max'])) {
+      return false;
+    } elseif(isset($options['exact']) && !has_length_exactly($value, $options['exact'])) {
+      return false;
+    } else {
+      return true;
+    }
     }
 
     function has_inclusion_of($value,$set) {

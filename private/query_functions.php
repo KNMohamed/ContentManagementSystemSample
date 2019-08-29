@@ -41,11 +41,58 @@ function find_page_by_id($id){
     return $page;
 }
 
+function validate_subject($subject){
+    $errors = [];
+
+    //menu_item
+    if(is_blank($subject['menu_name'])){
+        $errors[] = "Name cannot be blank.";
+    }elseif(!has_length($subject['menu_name'], ['min' => 2, 'max' => 255])){
+        $errors[] = "Name must be between 2 and 255 characters.";
+    }
+    
+    //position
+    $position_int = (int) $subject['position'];
+    if($position_int <= 0){
+        $errors[] = "Position must be greater than 0.";
+    }
+    if($position_int > 999){
+        $errors[] = "Position must be less than 999.";
+    }
+    //visible
+    if(!has_inclusion_of($subject['visible'], ["0","1"])){
+        $errors[] = "Visible must be true or false.";
+    }
+    return $errors;
+}
+
+
 function insert_subject($subject){
     global $db;
+    
+    $errors = validate_subject($subject);
+    if(!empty($errors)){
+        return $errors;
+    }
     $query = "INSERT INTO SUBJECTS ";
     $query .= "(menu_name,position,visible) ";
     $query .= "VALUES ('" . $subject['menu_name'] . "','" . $subject['position'] . "','" . $subject['visible'] . "')";
+    return mysqli_query($db,$query);
+}
+
+function update_subject($subject){
+    global $db;
+    
+    $errors = validate_subject($subject);
+    if(!empty($errors)){
+        return $errors;
+    }
+    $query = "UPDATE SUBJECTS SET ";
+    $query .= "menu_name='" . $subject['menu_name'] . "', ";
+    $query .= "position='" . $subject['position'] . "', ";
+    $query .= "visible='" . $subject['visible'] . "' ";
+    $query .= "WHERE id='" . $subject['id'] . "' ";
+    $query .= "LIMIT 1";
     return mysqli_query($db,$query);
 }
 
@@ -62,17 +109,6 @@ function insert_page($page){
     $sql .= "'" . $page['content'] . "'";
     $sql .= ")";
     return mysqli_query($db,$sql);
-}
-
-function update_subject($subject){
-    global $db;
-    $query = "UPDATE SUBJECTS SET ";
-    $query .= "menu_name='" . $subject['menu_name'] . "', ";
-    $query .= "position='" . $subject['position'] . "', ";
-    $query .= "visible='" . $subject['visible'] . "' ";
-    $query .= "WHERE id='" . $subject['id'] . "' ";
-    $query .= "LIMIT 1";
-    return mysqli_query($db,$query);
 }
 
 function update_page($page){
