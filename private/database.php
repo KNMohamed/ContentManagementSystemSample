@@ -29,4 +29,7 @@ function confirm_result_set($rs){
     }
 }
 
+function db_escape($db, $string){
+    return mysqli_real_escape_string($db,$string);
+}
 ?>

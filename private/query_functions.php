@@ -22,7 +22,7 @@ function find_all_pages(){
 function find_subject_by_id($id){
     global $db;
     $query = "SELECT * FROM SUBJECTS ";
-    $query .= "WHERE ID = '" . $id . "'";
+    $query .= "WHERE ID = '" . db_escape($db,$id) . "'";
     $rs = mysqli_query($db,$query);
     confirm_result_set($rs);
     $subject = mysqli_fetch_assoc($rs);
@@ -41,27 +41,74 @@ function find_page_by_id($id){
     return $page;
 }
 
+function validate_page($page){
+    $errors = [];
+    
+    //Subject_id
+    $subjectIds = [];
+    $rs = find_all_subjects();
+    confirm_result_set($rs);
+    while($subject = mysqli_fetch_assoc($rs)){
+        $subjectIds[] = $subject['id'];
+    }
+    mysqli_free_result($rs);
+    if(!has_inclusion_of($page['subject_id'],$subjectIds)){
+        $errors['subject_id'] = "Subject ID reference not valid.";
+    }
+    
+    // Menu_name
+    $current_id = $page['id'] ?? '0';
+    if(is_blank($page['menu_name'])){
+        $errors['menu_name'] = "Menu name is blank";
+    }elseif(!has_length($page['menu_name'], ['min' => 2, 'max' => 255])){
+        $errors['menu_name'] = "Name must be between 2 and 255 characters.";
+    }elseif(!has_unique_page_menu_name($page['menu_name'],$current_id)){
+        $errors['menu_name'] = "Menu name is not unique.";
+    }
+    
+    //position
+    $position_int = (int) $page['position'];
+    if($position_int <= 0){
+        $errors['position'] = "Position must be greater than 0.";
+    }
+    if($position_int > 999){
+        $errors['position'] = "Position must be less than 999.";
+    }
+    
+    //visible
+    if(!has_inclusion_of($page['visible'], ["0","1"])){
+        $errors['visible'] = "Visible must be true or false.";
+    }
+    
+    //content
+    if(is_blank($page['content'])){
+        $errors['content'] = "Page Content should not be blank.";
+    }
+    return $errors;
+}
+
+
 function validate_subject($subject){
     $errors = [];
 
     //menu_item
     if(is_blank($subject['menu_name'])){
-        $errors[] = "Name cannot be blank.";
+        $errors['menu_name'] = "Name cannot be blank.";
     }elseif(!has_length($subject['menu_name'], ['min' => 2, 'max' => 255])){
-        $errors[] = "Name must be between 2 and 255 characters.";
+        $errors['menu_name'] = "Name must be between 2 and 255 characters.";
     }
     
     //position
     $position_int = (int) $subject['position'];
     if($position_int <= 0){
-        $errors[] = "Position must be greater than 0.";
+        $errors['position'] = "Position must be greater than 0.";
     }
     if($position_int > 999){
-        $errors[] = "Position must be less than 999.";
+        $errors['position'] = "Position must be less than 999.";
     }
     //visible
     if(!has_inclusion_of($subject['visible'], ["0","1"])){
-        $errors[] = "Visible must be true or false.";
+        $errors['visible'] = "Visible must be true or false.";
     }
     return $errors;
 }
@@ -99,6 +146,11 @@ function update_subject($subject){
 function insert_page($page){
     global $db;
 
+    $errors = validate_page($page);
+    if(!empty($errors)){
+        return $errors;
+    }    
+    
     $sql = "INSERT INTO pages ";
     $sql .= "(subject_id, menu_name, position, visible, content) ";
     $sql .= "VALUES (";
@@ -113,6 +165,12 @@ function insert_page($page){
 
 function update_page($page){
     global $db;
+
+    $errors = validate_page($page);
+    if(!empty($errors)){
+        return $errors;
+    }   
+    
     $query = "UPDATE PAGES SET ";
     $query .= "subject_id='" . $page['subject_id'] . "', ";
     $query .= "menu_name='" . $page['menu_name'] . "', ";

@@ -2,7 +2,7 @@
 
 require_once('../../../private/initialize.php');
 
-$subject_count = get_subject_count();
+$subject_count = get_subject_count() + 1;
 $subject = [];
 $subject['menu_name'] = '';
 $subject['position'] = $subject_count;
@@ -21,10 +21,7 @@ if(is_post_request()){
         $new_id = mysqli_insert_id($db);
         redirect_to(url_for('/staff/subjects/show.php?id=' . $new_id));       
     }else{
-        var_dump($result);
-        echo "Error Creating Subject: " . mysqli_error($db);
-        db_disconnect($db);
-        exit;
+        $errors = $result;
     }
 }
 
@@ -38,12 +35,16 @@ if(is_post_request()){
 
     <div class="subject new">
         <h1>Create Subject</h1>
+ 
+        <?php echo display_errors($errors); ?>
 
         <form action="<?php echo url_for('/staff/subjects/new.php')?>" method="post">
             <dl>
                 <dt>Menu name</dt>
-                <dd><input type='text' name='menu_name' value="<?php 
-                    echo h($subject['menu_name']); ?>" /></dd>
+                <dd>
+                    <input type='text' id="menu_name" name='menu_name'
+                           value="<?php echo h($subject['menu_name']); ?>" />
+                </dd>
             </dl>
             <dl>
                 <dt>Position</dt>

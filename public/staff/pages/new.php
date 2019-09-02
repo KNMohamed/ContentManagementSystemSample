@@ -3,6 +3,7 @@
 require_once('../../../private/initialize.php');
 
 $page = [];
+$page_count = get_page_count() + 1;
 
 if(is_post_request()){
 
@@ -13,16 +14,15 @@ if(is_post_request()){
     $page['visible'] = $_POST['visible'] ?? '';
     $page['content'] = $_POST['content'] ?? '';
     
-    if(insert_page($page)){
+
+    $result = insert_page($page);
+    if($result === true){
         $new_id = mysqli_insert_id($db);
         redirect_to(url_for('/staff/pages/show.php?id=' . $new_id));
     }else{
-        echo "Error: " . mysqli_error($db) . " (" . mysqli_errno($db) . ")" ;
-        db_disconnect($db);
-        exit;
+        $errors = $result;
     }
 }else{
-    $page_count = get_page_count() + 1;
 
     $page['subject_id'] = '';
     $page['menu_name'] = '';
@@ -41,6 +41,8 @@ if(is_post_request()){
     
     <div class="page new">
         <h1>Create Page</h1>
+
+        <?php echo display_errors($errors); ?>
 
         <form action="<?php echo url_for('/staff/pages/new.php');?>" method="post">
             <dl>

@@ -7,6 +7,7 @@ if(!isset($_GET['id'])){
 }
 
 $id = $_GET['id'];
+$subject_count = get_subject_count();
 
 if(is_post_request()){
 
@@ -21,16 +22,13 @@ if(is_post_request()){
     if($result === true){
         redirect_to(url_for('/staff/subjects/show.php?id=' . $id));
     }else{
-        var_dump($result);
-        echo "Error: " . mysqli_error() . ' - (' . mysqli_errno() . ")";
-        db_disconnect($db);
-        exit;
+        $errors = $result;
+
     }
     
 
 }else{
     $subject = find_subject_by_id($id);
-    $subject_count = get_subject_count();
 }
 ?>
 
@@ -42,6 +40,8 @@ if(is_post_request()){
     <div class="subject new">
         <h1>Edit Subject</h1>
         
+        <?php echo display_errors($errors); ?>
+
         <form action="<?php echo url_for('/staff/subjects/edit.php?id=' . h(u($id)))?>" method="post">
             <dl>
                 <dt>Menu name</dt>

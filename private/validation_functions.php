@@ -4,6 +4,7 @@
     // is_blank('     '); => true
     * Validates data presence
     * Trims trailing and leading spaces and checks if empty string
+    * cannot use isempty because "0" will evaluate to true
     */
     function is_blank($data){
         return !isset($data) || trim($data) === "";
@@ -57,5 +58,18 @@
     function has_valid_email_format($value) {
         $email_regex = '/\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\Z/i';
         return preg_match($email_regex,$value) === 1;
+    }
+
+    function has_unique_page_menu_name($menu_name,$current_id="0"){
+        global $db;
+        
+        $query = "SELECT * FROM PAGES ";
+        $query .= "WHERE menu_name='" . $menu_name . "'";
+        $query .= "AND id !='" . $current_id . "'";
+        
+        $rs = mysqli_query($db,$query);
+        $page_count = mysqli_num_rows($rs);
+        mysqli_free_result($rs);
+        return $page_count === 0;
     }
 ?>

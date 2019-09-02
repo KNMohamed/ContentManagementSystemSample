@@ -5,7 +5,8 @@
         redirect_to(url_for('/staff/pages/index.php'));
     }
     $id = $_GET['id'];
-    
+    $page_count = get_page_count();
+
         
     if(is_post_request()){
         $page = [];
@@ -15,18 +16,17 @@
         $page['position'] = $_POST['position'] ?? '';
         $page['visible'] = $_POST['visible'] ?? '';
         $page['content'] = $_POST['content'] ?? '';
-        
-        if(update_page($page)){
+ 
+        $result = update_page($page);
+
+        if($result === true){
             redirect_to(url_for("/staff/pages/show.php?id=" . $id));
         }else{
-            echo "Error: " . mysqli_error($db) . "(" . mysqli_errno($db) . ")";
-            db_disconnect($db);
-            exit;
+            $errors = $result;
         }
 
     }else{
         $page = find_page_by_id($id);
-        $page_count = get_page_count();
     }
 ?>
 
@@ -39,6 +39,8 @@
     
     <div class="page new">
         <h1>Edit Page</h1>
+
+        <?php echo display_errors($errors); ?>
 
         <form action="<?php echo url_for('/staff/pages/edit.php?id=' . $id);?>" method="post">
             <dl>
