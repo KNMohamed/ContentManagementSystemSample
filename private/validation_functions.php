@@ -64,8 +64,8 @@
         global $db;
         
         $query = "SELECT * FROM PAGES ";
-        $query .= "WHERE menu_name='" . $menu_name . "'";
-        $query .= "AND id !='" . $current_id . "'";
+        $query .= "WHERE menu_name='" . db_escape($db,$menu_name) . "'";
+        $query .= "AND id !='" . db_escape($db,$current_id) . "'";
         
         $rs = mysqli_query($db,$query);
         $page_count = mysqli_num_rows($rs);

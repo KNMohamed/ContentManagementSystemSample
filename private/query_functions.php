@@ -19,11 +19,15 @@ function find_all_pages(){
     return $rs;
 }
 
+//Using prepared statement against sql injection
 function find_subject_by_id($id){
     global $db;
     $query = "SELECT * FROM SUBJECTS ";
-    $query .= "WHERE ID = '" . db_escape($db,$id) . "'";
-    $rs = mysqli_query($db,$query);
+    $query .= "WHERE ID = ?";
+    $stmt = mysqli_prepare($db,$query);
+    mysqli_stmt_bind_param($stmt,'i',$id);
+    mysqli_stmt_execute($stmt);
+    $rs = mysqli_stmt_get_result($stmt);
     confirm_result_set($rs);
     $subject = mysqli_fetch_assoc($rs);
     mysqli_free_result($rs);
@@ -33,7 +37,7 @@ function find_subject_by_id($id){
 function find_page_by_id($id){
     global $db;
     $query = "SELECT * FROM PAGES ";
-    $query .= "WHERE ID = '" . $id . "'";
+    $query .= "WHERE ID = '" . db_escape($db,$id) . "'";
     $rs = mysqli_query($db,$query);
     confirm_result_set($rs);
     $page = mysqli_fetch_assoc($rs);
@@ -123,7 +127,7 @@ function insert_subject($subject){
     }
     $query = "INSERT INTO SUBJECTS ";
     $query .= "(menu_name,position,visible) ";
-    $query .= "VALUES ('" . $subject['menu_name'] . "','" . $subject['position'] . "','" . $subject['visible'] . "')";
+    $query .= "VALUES ('" . db_escape($db,$subject['menu_name']) . "','" . db_escape($db,$subject['position']) . "','" . db_escape($db,$subject['visible']) . "')";
     return mysqli_query($db,$query);
 }
 
@@ -135,10 +139,10 @@ function update_subject($subject){
         return $errors;
     }
     $query = "UPDATE SUBJECTS SET ";
-    $query .= "menu_name='" . $subject['menu_name'] . "', ";
-    $query .= "position='" . $subject['position'] . "', ";
-    $query .= "visible='" . $subject['visible'] . "' ";
-    $query .= "WHERE id='" . $subject['id'] . "' ";
+    $query .= "menu_name='" . db_escape($db,$subject['menu_name']) . "', ";
+    $query .= "position='" . db_escape($db,$subject['position']) . "', ";
+    $query .= "visible='" . db_escape($db,$subject['visible']) . "' ";
+    $query .= "WHERE id='" . db_escape($db,$subject['id']) . "' ";
     $query .= "LIMIT 1";
     return mysqli_query($db,$query);
 }
@@ -154,11 +158,11 @@ function insert_page($page){
     $sql = "INSERT INTO pages ";
     $sql .= "(subject_id, menu_name, position, visible, content) ";
     $sql .= "VALUES (";
-    $sql .= "'" . $page['subject_id'] . "',";
-    $sql .= "'" . $page['menu_name'] . "',";
-    $sql .= "'" . $page['position'] . "',";
-    $sql .= "'" . $page['visible'] . "',";
-    $sql .= "'" . $page['content'] . "'";
+    $sql .= "'" . db_escape($db,$page['subject_id']) . "',";
+    $sql .= "'" . db_escape($db,$page['menu_name']) . "',";
+    $sql .= "'" . db_escape($db,$page['position']) . "',";
+    $sql .= "'" . db_escape($db,$page['visible']) . "',";
+    $sql .= "'" . db_escape($db,$page['content']) . "'";
     $sql .= ")";
     return mysqli_query($db,$sql);
 }
@@ -172,12 +176,12 @@ function update_page($page){
     }   
     
     $query = "UPDATE PAGES SET ";
-    $query .= "subject_id='" . $page['subject_id'] . "', ";
-    $query .= "menu_name='" . $page['menu_name'] . "', ";
-    $query .= "position='" . $page['position'] . "', ";
-    $query .= "visible='" . $page['visible'] . "', ";
-    $query .= "content='" . $page['content'] . "' ";
-    $query .= "WHERE id='" . $page['id'] . "' ";
+    $query .= "subject_id='" . db_escape($db,$page['subject_id']) . "', ";
+    $query .= "menu_name='" . db_escape($db,$page['menu_name']) . "', ";
+    $query .= "position='" . db_escape($db,$page['position']) . "', ";
+    $query .= "visible='" . db_escape($db,$page['visible']) . "', ";
+    $query .= "content='" . db_escape($db,$page['content']) . "' ";
+    $query .= "WHERE id='" . db_escape($db,$page['id']) . "' ";
     $query .= "LIMIT 1";
     return mysqli_query($db,$query);
 }
@@ -207,7 +211,7 @@ function get_page_count(){
 function delete_subject($id){
     global $db;
     $query = "DELETE FROM SUBJECTS ";
-    $query .= "WHERE ID = '" . $id . "' ";
+    $query .= "WHERE ID = '" . db_escape($db,$id) . "' ";
     $query .= "LIMIT 1";
     return mysqli_query($db,$query); 
 }
@@ -215,7 +219,7 @@ function delete_subject($id){
 function delete_page($id){
     global $db;
     $query = "DELETE FROM PAGES ";
-    $query .= "WHERE ID = '" . $id . "' ";
+    $query .= "WHERE ID = '" . db_escape($db,$id) . "' ";
     $query .= "LIMIT 1";
     return mysqli_query($db,$query); 
 }
